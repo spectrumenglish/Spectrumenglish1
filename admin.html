@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Spectrum English</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        /* Smooth fade in for dynamic elements */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    
+    <!-- Top Navigation -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-600 mr-4 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-crown text-yellow-500 mr-2"></i>
+                        Spectrum Admin
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700 hidden sm:block">Welcome, <span id="adminName" class="font-semibold">Admin</span></span>
+                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm text-sm">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 min-h-screen shadow-lg fixed md:relative transition-transform duration-300 z-20">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="#" data-page="dashboard" class="admin-nav-link block py-3 px-4 rounded-lg border border-blue-600 text-blue-600 bg-blue-50 font-medium transition-colors">
+                        <i class="fas fa-tachometer-alt mr-3 w-5"></i>Dashboard
+                    </a>
+                    <a href="#" data-page="categories" class="admin-nav-link block py-3 px-4 rounded-lg border border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-tags mr-3 w-5"></i>Categories
+                    </a>
+                    <a href="#" data-page="courses" class="admin-nav-link block py-3 px-4 rounded-lg border border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-book mr-3 w-5"></i>Courses
+                    </a>
+                    <a href="#" data-page="tests" class="admin-nav-link block py-3 px-4 rounded-lg border border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-file-alt mr-3 w-5"></i>MCQ Tests
+                    </a>
+                    <a href="#" data-page="materials" class="admin-nav-link block py-3 px-4 rounded-lg border border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-file-pdf mr-3 w-5"></i>Study Materials
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-0 p-6 md:p-8 overflow-x-hidden">
+            <div class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 id="page-title" class="text-3xl font-bold text-gray-800">Dashboard</h2>
+                    <p class="text-gray-500 mt-1">Manage your educational content and student resources.</p>
+                </div>
+            </div>
+
+            <!-- DASHBOARD PAGE -->
+            <div id="dashboard-page" class="admin-page active">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center">
+                            <div class="p-4 bg-blue-50 rounded-full mr-4">
+                                <i class="fas fa-book text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-800" id="total-courses">0</h3>
+                                <p class="text-sm text-gray-500 font-medium uppercase tracking-wide">Total Courses</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+                        <div class="flex items-center">
+                            <div class="p-4 bg-green-50 rounded-full mr-4">
+                                <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-800" id="total-tests">0</h3>
+                                <p class="text-sm text-gray-500 font-medium uppercase tracking-wide">Total Tests</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center">
+                            <div class="p-4 bg-purple-50 rounded-full mr-4">
+                                <i class="fas fa-file-pdf text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-800" id="total-materials">0</h3>
+                                <p class="text-sm text-gray-500 font-medium uppercase tracking-wide">Study Materials</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <button onclick="openCourseModal()" class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all group">
+                        <div class="bg-blue-50 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-plus text-blue-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">Add Course</p>
+                    </button>
+                    <button onclick="openTestModal()" class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100 hover:border-green-500 hover:shadow-md transition-all group">
+                        <div class="bg-green-50 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-green-600 transition-colors">
+                            <i class="fas fa-plus text-green-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">Create Test</p>
+                    </button>
+                    <button onclick="openMaterialModal()" class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100 hover:border-purple-500 hover:shadow-md transition-all group">
+                        <div class="bg-purple-50 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-600 transition-colors">
+                            <i class="fas fa-plus text-purple-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">Add Material</p>
+                    </button>
+                    <button onclick="window.open('../index.html', '_blank')" class="bg-white rounded-xl shadow-sm p-6 text-center border border-gray-100 hover:border-orange-500 hover:shadow-md transition-all group">
+                        <div class="bg-orange-50 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-600 transition-colors">
+                            <i class="fas fa-external-link-alt text-orange-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">View Website</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CATEGORIES PAGE -->
+            <div id="categories-page" class="admin-page hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-800">Categories List</h3>
+                        <button onclick="openCategoryModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm">
+                            <i class="fas fa-plus mr-2"></i>Add New
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-medium">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Category Name</th>
+                                    <th class="px-6 py-3 text-left">Items Count</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-table-body" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COURSES PAGE -->
+            <div id="courses-page" class="admin-page hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-800">All Courses</h3>
+                        <button onclick="openCourseModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm">
+                            <i class="fas fa-plus mr-2"></i>Add Course
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-medium">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Course Info</th>
+                                    <th class="px-6 py-3 text-left">Category</th>
+                                    <th class="px-6 py-3 text-left">Price</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courses-table-body" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TESTS PAGE -->
+            <div id="tests-page" class="admin-page hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-800">MCQ Tests</h3>
+                        <button onclick="openTestModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm">
+                            <i class="fas fa-plus mr-2"></i>Create Test
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-medium">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Test Name</th>
+                                    <th class="px-6 py-3 text-left">Details</th>
+                                    <th class="px-6 py-3 text-left">Duration</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tests-table-body" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MATERIALS PAGE -->
+            <div id="materials-page" class="admin-page hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Study Materials Library</h3>
+                    <button onclick="openMaterialModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm">
+                        <i class="fas fa-plus mr-2"></i>Add Material
+                    </button>
+                </div>
+                <div id="materials-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="category-modal-title" class="text-xl font-bold text-gray-800">Add New Category</h3>
+                <button onclick="closeModal('category-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category Name</label>
+                    <input type="text" id="category-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" required>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('category-modal')" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-transform transform active:scale-95">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Modal (With Download Link) -->
+    <div id="course-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="course-modal-title" class="text-xl font-bold text-gray-800">Add New Course</h3>
+                <button onclick="closeModal('course-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="course-form" class="space-y-4">
+                <input type="hidden" id="course-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
+                        <input type="text" id="course-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="course-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
+                            <option value="">Select Category</option>
+                            <option value="grammar">English Grammar</option>
+                            <option value="jobs">Jobs Preparing</option>
+                            <option value="paid-groups">Premium WhatsApp Groups</option>
+                            <option value="free-groups">Free WhatsApp Groups</option>
+                            <option value="vocabulary">Vocabulary</option>
+                            <option value="free">Free Resources</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price (PKR)</label>
+                        <input type="number" id="course-price" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="0" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                        <input type="url" id="course-image" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://...">
+                    </div>
+                </div>
+
+                <!-- NEW: Download File Link -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Download File URL (Optional, for Free Courses)</label>
+                    <input type="url" id="course-file" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://drive.google.com/...">
+                    <p class="text-xs text-gray-500 mt-1">If set, the "Join Now" button becomes a "Download" button.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="course-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Features (One per line)</label>
+                    <textarea id="course-features" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Interactive Lessons&#10;Live Sessions"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="closeModal('course-modal')" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-transform transform active:scale-95">Save Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Test Modal (With Question Builder) -->
+    <div id="test-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 pb-2 border-b border-gray-100">
+                <h3 id="test-modal-title" class="text-xl font-bold text-gray-800">Create New Test</h3>
+                <button onclick="closeModal('test-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="test-form" class="space-y-6">
+                <input type="hidden" id="test-id">
+                
+                <!-- Test Basic Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Test Name</label>
+                        <input type="text" id="test-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" required placeholder="e.g. Grammar Level 1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                        <input type="number" id="test-duration" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" value="30" min="1" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="test-description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Brief description of the test..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Question Builder Area -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-list-ol text-green-600 mr-2"></i> Questions
+                        </h4>
+                        <button type="button" id="add-question-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> Add Question
+                        </button>
+                    </div>
+                    
+                    <!-- Dynamic Question Container -->
+                    <div id="questions-container" class="space-y-4">
+                        <!-- Questions will be injected here via JS -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="no-questions-msg" class="text-center py-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-400">
+                        <i class="fas fa-clipboard-list text-4xl mb-2"></i>
+                        <p>No questions added yet. Click "Add Question" to start.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="closeModal('test-modal')" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-transform transform active:scale-95">Save Test</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Material Modal -->
+    <div id="material-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="material-modal-title" class="text-xl font-bold text-gray-800">Add Study Material</h3>
+                <button onclick="closeModal('material-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="material-form" class="space-y-4">
+                <input type="hidden" id="material-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" id="material-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="material-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" required>
+                        <option value="">Select Category</option>
+                        <option value="pdf">PDF Documents</option>
+                        <option value="dawn">Dawn News</option>
+                        <option value="mcqs">MCQs</option>
+                        <option value="vocabulary">Vocabulary</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File URL</label>
+                    <input type="url" id="material-file" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="material-image" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" placeholder="https://...">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="closeModal('material-modal')" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition-transform transform active:scale-95">Save Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script>
+        console.log("Admin panel loaded!");
+
+        // 1. Auth Check
+        if (!localStorage.getItem('adminLoggedIn')) {
+            window.location.href = '../login.html';
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = '../login.html';
+        });
+
+        // 2. Navigation Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.admin-nav-link');
+            const pages = document.querySelectorAll('.admin-page');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Style Active Link
+                    navLinks.forEach(nav => {
+                        nav.classList.remove('border-blue-600', 'text-blue-600', 'bg-blue-50');
+                        nav.classList.add('border-transparent', 'text-gray-600');
+                    });
+                    this.classList.remove('border-transparent', 'text-gray-600');
+                    this.classList.add('border-blue-600', 'text-blue-600', 'bg-blue-50');
+                    
+                    // Show Page
+                    pages.forEach(page => page.classList.add('hidden'));
+                    const targetPage = document.getElementById(`${pageId}-page`);
+                    targetPage.classList.remove('hidden');
+                    targetPage.classList.add('fade-in'); // Add animation class
+                    
+                    // Update Header
+                    document.getElementById('page-title').textContent = this.textContent.trim();
+                    
+                    // Lazy Load Data
+                    if (pageId === 'courses') loadCoursesTable();
+                    else if (pageId === 'tests') loadTestsTable();
+                    else if (pageId === 'materials') loadMaterialsGrid();
+                });
+            });
+
+            // Initial Load
+            loadDashboard();
+            document.getElementById('add-question-btn').addEventListener('click', () => addQuestionField());
+            
+            // Mobile Menu
+            const sidebar = document.querySelector('.sidebar');
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        });
+
+        // 3. CRUD Functions
+        function loadDashboard() {
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            const tests = JSON.parse(localStorage.getItem('tests')) || [];
+            const materials = JSON.parse(localStorage.getItem('materials')) || [];
+            
+            document.getElementById('total-courses').textContent = courses.length;
+            document.getElementById('total-tests').textContent = tests.length;
+            document.getElementById('total-materials').textContent = materials.length;
+        }
+
+        // --- COURSES ---
+        function loadCoursesTable() {
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            const tbody = document.getElementById('courses-table-body');
+            
+            if (courses.length === 0) {
+                tbody.innerHTML = '<tr><td class="px-6 py-8 text-center text-gray-500" colspan="4">No courses found. Add one to get started!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = courses.map(course => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <img class="h-10 w-10 rounded-lg object-cover border border-gray-200" src="${course.image || 'https://placehold.co/100x100'}" alt="${course.title}">
+                            <div class="ml-4">
+                                <div class="text-sm font-bold text-gray-900">${course.title}</div>
+                                <div class="text-xs text-gray-500">${course.description.substring(0, 40)}...</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200">${course.category}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                        ${course.price > 0 ? `PKR ${course.price}` : '<span class="text-green-600">Free</span>'}
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editCourse('${course.id}')" class="text-blue-600 hover:text-blue-800 p-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteCourse('${course.id}')" class="text-red-600 hover:text-red-800 p-1"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- TESTS ---
+        function loadTestsTable() {
+            const tests = JSON.parse(localStorage.getItem('tests')) || [];
+            const tbody = document.getElementById('tests-table-body');
+            
+            if (tests.length === 0) {
+                tbody.innerHTML = '<tr><td class="px-6 py-8 text-center text-gray-500" colspan="4">No tests created yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tests.map(test => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900">${test.name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${test.questions ? test.questions.length : 0} Questions</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${test.duration} mins</td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editTest('${test.id}')" class="text-blue-600 hover:text-blue-800 p-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteTest('${test.id}')" class="text-red-600 hover:text-red-800 p-1"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- MATERIALS ---
+        function loadMaterialsGrid() {
+            const materials = JSON.parse(localStorage.getItem('materials')) || [];
+            const grid = document.getElementById('materials-grid');
+            
+            if (materials.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">No materials uploaded yet.</div>';
+                return;
+            }
+
+            grid.innerHTML = materials.map(mat => `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="h-32 bg-gray-100 relative">
+                        <img src="${mat.image || 'https://placehold.co/400x300'}" class="w-full h-full object-cover">
+                        <span class="absolute top-2 right-2 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded shadow">${mat.category}</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-gray-800 mb-1 truncate">${mat.title}</h4>
+                        <div class="flex justify-between items-center mt-4">
+                            <a href="${mat.file}" target="_blank" class="text-purple-600 text-xs font-semibold hover:underline">View File</a>
+                            <div class="space-x-2">
+                                <button onclick="editMaterial('${mat.id}')" class="text-gray-400 hover:text-blue-600"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteMaterial('${mat.id}')" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 4. Test Question Builder Logic (Dynamic HTML Generation)
+        function addQuestionField(question = null) {
+            const container = document.getElementById('questions-container');
+            const noMsg = document.getElementById('no-questions-msg');
+            if(noMsg) noMsg.style.display = 'none';
+
+            const count = container.querySelectorAll('.question-item').length + 1;
+            
+            // Generate STYLED HTML for question block
+            const html = `
+                <div class="question-item bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm relative transition-all duration-200 hover:shadow-md hover:border-blue-300 group fade-in">
+                    <!-- Delete Button -->
+                    <button type="button" class="remove-question absolute top-4 right-4 text-red-400 hover:text-red-600 bg-white p-2 rounded-lg shadow-sm border border-gray-100 transition-colors">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    
+                    <h5 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Question #${count}</h5>
+                    
+                    <!-- Question Text -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+                        <textarea class="question-text w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" rows="2" placeholder="Enter question here..." required>${question ? question.question : ''}</textarea>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        ${[0, 1, 2, 3].map((i) => `
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Option ${String.fromCharCode(65 + i)}</label>
+                                <input type="text" class="option-${i} w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" placeholder="Answer option..." value="${question && question.options[i] ? question.options[i] : ''}" required>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Correct Answer & Explanation -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
+                            <select class="correct-answer w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white" required>
+                                <option value="0" ${question && question.correctAnswer === 0 ? 'selected' : ''}>Option A</option>
+                                <option value="1" ${question && question.correctAnswer === 1 ? 'selected' : ''}>Option B</option>
+                                <option value="2" ${question && question.correctAnswer === 2 ? 'selected' : ''}>Option C</option>
+                                <option value="3" ${question && question.correctAnswer === 3 ? 'selected' : ''}>Option D</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Explanation (Optional)</label>
+                            <input type="text" class="explanation w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" placeholder="Why is this correct?" value="${question ? (question.explanation || '') : ''}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+
+            // Bind delete event to the new button
+            const newBlock = container.lastElementChild;
+            newBlock.querySelector('.remove-question').addEventListener('click', function() {
+                if(confirm('Remove this question?')) {
+                    newBlock.remove();
+                    // Re-numbering logic
+                    const items = container.querySelectorAll('.question-item');
+                    if(items.length === 0) document.getElementById('no-questions-msg').style.display = 'block';
+                    items.forEach((item, idx) => {
+                        item.querySelector('h5').textContent = `Question #${idx + 1}`;
+                    });
+                }
+            });
+        }
+
+        // 5. Form Submissions
+        
+        // SAVE COURSE (Updated with File Link)
+        document.getElementById('course-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            const id = document.getElementById('course-id').value;
+            
+            const data = {
+                id: id || Date.now().toString(),
+                title: document.getElementById('course-title').value,
+                category: document.getElementById('course-category').value,
+                price: parseFloat(document.getElementById('course-price').value),
+                file: document.getElementById('course-file').value, // Capture File URL
+                image: document.getElementById('course-image').value,
+                description: document.getElementById('course-description').value,
+                features: document.getElementById('course-features').value.split('\n').filter(t => t.trim())
+            };
+
+            if (id) {
+                const idx = courses.findIndex(c => c.id === id);
+                if (idx !== -1) courses[idx] = data;
+            } else {
+                courses.push(data);
+            }
+
+            localStorage.setItem('courses', JSON.stringify(courses));
+            closeModal('course-modal');
+            loadCoursesTable();
+            loadDashboard();
+        });
+
+        // SAVE TEST (With Questions)
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tests = JSON.parse(localStorage.getItem('tests')) || [];
+            const id = document.getElementById('test-id').value;
+            
+            // Gather Questions
+            const qItems = document.querySelectorAll('.question-item');
+            const questions = Array.from(qItems).map((item, idx) => ({
+                id: idx + 1,
+                question: item.querySelector('.question-text').value,
+                options: [
+                    item.querySelector('.option-0').value,
+                    item.querySelector('.option-1').value,
+                    item.querySelector('.option-2').value,
+                    item.querySelector('.option-3').value
+                ],
+                correctAnswer: parseInt(item.querySelector('.correct-answer').value),
+                explanation: item.querySelector('.explanation').value
+            }));
+
+            if(questions.length === 0) {
+                alert("Please add at least one question.");
+                return;
+            }
+
+            const data = {
+                id: id || Date.now().toString(),
+                name: document.getElementById('test-name').value,
+                duration: document.getElementById('test-duration').value,
+                description: document.getElementById('test-description').value,
+                questions: questions
+            };
+
+            if (id) {
+                const idx = tests.findIndex(t => t.id === id);
+                if (idx !== -1) tests[idx] = data;
+            } else {
+                tests.push(data);
+            }
+
+            localStorage.setItem('tests', JSON.stringify(tests));
+            closeModal('test-modal');
+            loadTestsTable();
+            loadDashboard();
+        });
+
+        // SAVE MATERIAL
+        document.getElementById('material-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const materials = JSON.parse(localStorage.getItem('materials')) || [];
+            const id = document.getElementById('material-id').value;
+            
+            const data = {
+                id: id || Date.now().toString(),
+                title: document.getElementById('material-title').value,
+                category: document.getElementById('material-category').value,
+                file: document.getElementById('material-file').value,
+                image: document.getElementById('material-image').value
+            };
+
+            if (id) {
+                const idx = materials.findIndex(m => m.id === id);
+                if (idx !== -1) materials[idx] = data;
+            } else {
+                materials.push(data);
+            }
+
+            localStorage.setItem('materials', JSON.stringify(materials));
+            closeModal('material-modal');
+            loadMaterialsGrid();
+            loadDashboard();
+        });
+
+        // 6. Modal & Helper Functions
+        function openCourseModal() { document.getElementById('course-modal').classList.remove('hidden'); }
+        function openTestModal() { document.getElementById('test-modal').classList.remove('hidden'); }
+        function openMaterialModal() { document.getElementById('material-modal').classList.remove('hidden'); }
+        function openCategoryModal() { document.getElementById('category-modal').classList.remove('hidden'); }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            // Simple form reset logic
+            if(id === 'course-modal') {
+                document.getElementById('course-form').reset();
+                document.getElementById('course-id').value = '';
+                document.getElementById('course-modal-title').textContent = 'Add New Course';
+            }
+            if(id === 'test-modal') {
+                document.getElementById('test-form').reset();
+                document.getElementById('test-id').value = '';
+                document.getElementById('test-modal-title').textContent = 'Create New Test';
+                document.getElementById('questions-container').innerHTML = '';
+                document.getElementById('no-questions-msg').style.display = 'block';
+            }
+            if(id === 'material-modal') {
+                document.getElementById('material-form').reset();
+                document.getElementById('material-id').value = '';
+            }
+        }
+
+        // Edit Pre-fill Logic
+        function editCourse(id) {
+            const course = JSON.parse(localStorage.getItem('courses')).find(c => c.id === id);
+            if(course) {
+                document.getElementById('course-id').value = course.id;
+                document.getElementById('course-title').value = course.title;
+                document.getElementById('course-category').value = course.category;
+                document.getElementById('course-price').value = course.price;
+                document.getElementById('course-file').value = course.file || ''; // Populate File
+                document.getElementById('course-image').value = course.image;
+                document.getElementById('course-description').value = course.description;
+                document.getElementById('course-features').value = (course.features || []).join('\n');
+                document.getElementById('course-modal-title').textContent = 'Edit Course';
+                openCourseModal();
+            }
+        }
+
+        function editTest(id) {
+            const test = JSON.parse(localStorage.getItem('tests')).find(t => t.id === id);
+            if(test) {
+                document.getElementById('test-id').value = test.id;
+                document.getElementById('test-name').value = test.name;
+                document.getElementById('test-duration').value = test.duration;
+                document.getElementById('test-description').value = test.description;
+                
+                // Load Questions
+                const container = document.getElementById('questions-container');
+                container.innerHTML = '';
+                if(test.questions && test.questions.length > 0) {
+                    test.questions.forEach(q => addQuestionField(q));
+                } else {
+                    document.getElementById('no-questions-msg').style.display = 'block';
+                }
+                
+                document.getElementById('test-modal-title').textContent = 'Edit Test';
+                openTestModal();
+            }
+        }
+
+        function editMaterial(id) {
+            const mat = JSON.parse(localStorage.getItem('materials')).find(m => m.id === id);
+            if(mat) {
+                document.getElementById('material-id').value = mat.id;
+                document.getElementById('material-title').value = mat.title;
+                document.getElementById('material-category').value = mat.category;
+                document.getElementById('material-file').value = mat.file;
+                document.getElementById('material-image').value = mat.image;
+                openMaterialModal();
+            }
+        }
+
+        // Deletes
+        function deleteCourse(id) {
+            if(confirm('Delete course?')) {
+                const courses = JSON.parse(localStorage.getItem('courses')).filter(c => c.id !== id);
+                localStorage.setItem('courses', JSON.stringify(courses));
+                loadCoursesTable(); loadDashboard();
+            }
+        }
+        function deleteTest(id) {
+            if(confirm('Delete test?')) {
+                const tests = JSON.parse(localStorage.getItem('tests')).filter(t => t.id !== id);
+                localStorage.setItem('tests', JSON.stringify(tests));
+                loadTestsTable(); loadDashboard();
+            }
+        }
+        function deleteMaterial(id) {
+            if(confirm('Delete material?')) {
+                const mats = JSON.parse(localStorage.getItem('materials')).filter(m => m.id !== id);
+                localStorage.setItem('materials', JSON.stringify(mats));
+                loadMaterialsGrid(); loadDashboard();
+            }
+        }
+    </script>
+</body>
+</html>

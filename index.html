@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectrum English - Online Courses & Study Materials</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 1. Global Styles & Variables */
+        :root {
+            --primary-color: #007bff;
+            --accent-color: #25d366;
+            --dark-bg: #1f2937;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        /* 2. Custom Button & Link Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            transform: translateY(-1px);
+        }
+        .btn-whatsapp {
+            background-color: var(--accent-color);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-whatsapp:hover {
+            background-color: #1faa54;
+            transform: translateY(-1px);
+        }
+
+        /* 3. Navigation & Page Management */
+        .nav-link.active {
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .page-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .page-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 4. Filtering/Category Tabs */
+        .category-filter {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .category-filter:hover {
+            color: var(--primary-color);
+        }
+        .category-filter.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 5. Card Animation */
+        .item-card, .item-card-study, .animate-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .item-card.visible, .item-card-study.visible, .animate-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 6. Hero Specific Styles */
+        .hero-bg {
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
+        }
+        .shadow-3xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 7. Course Image Styling */
+        .course-card-img {
+            height: 150px;
+            width: 100%;
+            object-fit: cover;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        /* 8. Study Material Image Styling */
+        .study-material-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        /* 9. Button Styles for Study Materials */
+        .btn-download {
+            background-color: #007bff;
+            transition: background-color 0.3s;
+        }
+        .btn-download:hover {
+            background-color: #0056b3;
+        }
+
+        /* 10. Mobile Menu Backdrop */
+        .mobile-menu-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+        }
+
+        /* 11. MCQ Test Specific Styles */
+        .mcq-option {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .mcq-option:hover {
+            background-color: #f0f9ff;
+        }
+        .mcq-option.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+        .mcq-option.correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .mcq-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .question-number {
+            transition: all 0.3s;
+        }
+        .question-number.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .question-number.answered {
+            background-color: #10b981;
+            color: white;
+        }
+        .question-number.flagged {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .timer-warning {
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .review-explanation {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="text-2xl font-extrabold text-gray-800 flex items-center">
+                <i class="fas fa-book-open text-blue-600 mr-2"></i>
+                <span class="text-blue-600">Spectrum</span> English
+            </div>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link text-gray-600 hover:text-blue-600 pb-1" data-page="home">Home</a>
+                <a href="#courses" class="nav-link text-gray-600 hover:text-blue-600 pb-1" data-page="courses">Courses</a>
+                <a href="#ebooks" class="nav-link text-gray-600 hover:text-blue-600 pb-1" data-page="ebooks">Study Materials</a>
+                <a href="#mcq-test" class="nav-link text-gray-600 hover:text-blue-600 pb-1" data-page="mcq-test">MCQ Test</a>
+                <a href="#contact" class="nav-link text-gray-600 hover:text-blue-600 pb-1" data-page="contact">Contact</a>
+            </nav>
+            
+            <!-- WhatsApp Button -->
+            <a href="https://wa.me/923013858453?text=Assalamualikum.%20I%20am%20interested%20in%20your%20English%20Course." target="_blank" class="hidden md:block btn-whatsapp text-white px-4 py-2 rounded-full font-semibold shadow-md">
+                <i class="fab fa-whatsapp mr-2"></i> Enroll Now
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-600 hover:text-blue-600 text-xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Backdrop -->
+    <div id="mobile-menu-backdrop" class="mobile-menu-backdrop fixed inset-0 z-40 hidden"></div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="fixed inset-y-0 left-0 w-64 bg-white z-50 transition-transform duration-300 transform -translate-x-full md:hidden shadow-xl">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-xl font-extrabold text-gray-800 flex items-center">
+                    <i class="fas fa-book-open text-blue-600 mr-2"></i>
+                    <span class="text-blue-600">Spectrum</span> English
+                </div>
+                <button id="close-menu-btn" class="text-gray-600 hover:text-blue-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="flex flex-col space-y-4 flex-grow">
+                <a href="#home" class="mobile-nav-link text-gray-800 hover:text-blue-600 text-lg py-2 border-b" data-page="home">Home</a>
+                <a href="#courses" class="mobile-nav-link text-gray-800 hover:text-blue-600 text-lg py-2 border-b" data-page="courses">Courses</a>
+                <a href="#ebooks" class="mobile-nav-link text-gray-800 hover:text-blue-600 text-lg py-2 border-b" data-page="ebooks">Study Materials</a>
+                <a href="#mcq-test" class="mobile-nav-link text-gray-800 hover:text-blue-600 text-lg py-2 border-b" data-page="mcq-test">MCQ Test</a>
+                <a href="#contact" class="mobile-nav-link text-gray-800 hover:text-blue-600 text-lg py-2 border-b" data-page="contact">Contact</a>
+            </nav>
+            <div class="mt-auto">
+                <a href="https://wa.me/923013858453?text=Assalamualikum.%20I%20am%20interested%20in%20your%20English%20Course." target="_blank" class="btn-whatsapp text-white text-center px-4 py-3 mt-4 rounded-lg font-semibold shadow-lg block">
+                    <i class="fab fa-whatsapp mr-2"></i> Enroll Now
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Home Page Content -->
+        <section id="home-page" class="page-content active" data-page="home">
+            <div class="text-center py-20 bg-white rounded-3xl shadow-3xl hero-bg animate-fade-in border border-blue-100" data-delay="100">
+                <span class="inline-block text-sm font-semibold text-blue-700 bg-blue-100 px-4 py-1 rounded-full mb-4 uppercase tracking-wider">
+                    Learn from the Best in Pakistan
+                </span>
+                <h1 class="text-5xl sm:text-7xl font-extrabold text-gray-900 mb-6 leading-snug">
+                    Master English Fluency <br> The <span class="text-blue-700">Spectrum Way</span>
+                </h1>
+                <p class="text-xl sm:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto font-light">
+                    Complete online learning platform for Spoken English, Grammar, and IELTS Preparation, right from Pakistan.
+                </p>
+                <a href="#courses" class="nav-link text-white text-lg px-10 py-5 rounded-full font-bold shadow-2xl hover:shadow-3xl inline-block transition duration-300 transform hover:scale-105" 
+                   style="background-image: linear-gradient(90deg, #007bff, #0056b3);" data-page="courses">
+                    Explore All Courses <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 mt-12 mb-8 bg-white p-6 rounded-xl shadow-lg animate-fade-in" data-delay="200">
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-blue-600">5K+</p>
+                    <p class="text-sm text-gray-500">Satisfied Students</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-blue-600">98%</p>
+                    <p class="text-sm text-gray-500">Success Rate (IELTS)</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-bold text-blue-600">30+</p>
+                    <p class="text-sm text-gray-500">Total Courses</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mt-12">
+                <div class="bg-white p-6 rounded-xl shadow-lg item-card" data-delay="400">
+                    <i class="fas fa-microphone text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Fluency Focused</h3>
+                    <p class="text-gray-600">Practice speaking daily with interactive sessions and native-like pronunciation training.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg item-card" data-delay="600">
+                    <i class="fas fa-laptop-code text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Anytime, Anywhere</h3>
+                    <p class="text-gray-600">Access video lectures and notes 24/7 on your mobile or desktop.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg item-card" data-delay="800">
+                    <i class="fas fa-wallet text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Affordable Pricing</h3>
+                    <p class="text-gray-600">High-quality education at prices tailored for the local Pakistani market.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Courses Page Content -->
+        <section id="courses-page" class="page-content" data-page="courses">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 animate-fade-in">Our Premium Courses</h2>
+            
+            <!-- Category Filters -->
+            <div id="course-categories-list" class="flex space-x-6 border-b border-gray-200 mb-6 overflow-x-auto">
+                <div class="category-filter active py-3 px-2" data-filter="all-courses">All Courses</div>
+                <div class="category-filter py-3 px-2" data-filter="paid">Paid</div>
+                <div class="category-filter py-3 px-2" data-filter="free">Free</div>
+                <div class="category-filter py-3 px-2" data-filter="grammar">English Grammar</div>
+                <div class="category-filter py-3 px-2" data-filter="jobs">Jobs Preparing</div>
+                <div class="category-filter py-3 px-2" data-filter="paid-groups">Premium WhatsApp Groups</div>
+                <div class="category-filter py-3 px-2" data-filter="free-groups">Free WhatsApp Groups</div>
+            </div>
+
+            <!-- Course Grid (Populated Dynamically) -->
+            <div id="course-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Javascript will inject content here, overwriting any static placeholders -->
+                <p class="text-gray-500 col-span-3 text-center py-10">Loading courses...</p>
+            </div>
+        </section>
+
+
+        <!-- Study Materials Page Content -->
+        <section id="ebooks-page" class="page-content" data-page="ebooks">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 animate-fade-in">Study Materials</h2>
+            
+            <!-- Study Material Filters -->
+            <div id="study-categories-list" class="flex space-x-6 border-b border-gray-200 mb-6 overflow-x-auto">
+                <div class="category-filter active py-3 px-2" data-filter="all-study">All Materials</div>
+                <div class="category-filter py-3 px-2" data-filter="pdf">PDF Documents</div>
+                <div class="category-filter py-3 px-2" data-filter="dawn">Dawn News</div>
+                <div class="category-filter py-3 px-2" data-filter="mcqs">MCQs</div>
+                <div class="category-filter py-3 px-2" data-filter="vocabulary">Vocabulary</div>
+            </div>
+            
+            <!-- PDF Materials Grid (Populated Dynamically) -->
+            <div id="ebook-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Javascript will inject content here -->
+                <p class="text-gray-500 col-span-5 text-center py-10">Loading materials...</p>
+            </div>
+        </section>
+
+
+        <!-- MCQ Test Page Content -->
+        <section id="mcq-test-page" class="page-content" data-page="mcq-test">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <!-- Test Header -->
+                <div class="bg-blue-700 text-white p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div>
+                            <h1 id="test-title" class="text-2xl font-bold">English Grammar MCQ Test</h1>
+                            <p class="text-blue-100">Test your English grammar knowledge with our comprehensive quiz</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                            <div class="text-center">
+                                <div id="timer" class="text-2xl font-bold">30:00</div>
+                                <div class="text-sm text-blue-200">Time Remaining</div>
+                            </div>
+                            <button id="pause-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg">
+                                <i class="fas fa-pause mr-2"></i> Pause
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-gray-200 h-2">
+                    <div id="progress-bar" class="progress-bar bg-blue-600 h-2" style="width: 0%"></div>
+                </div>
+
+                <!-- Test Content -->
+                <div class="flex flex-col md:flex-row">
+                    <!-- Questions Navigation -->
+                    <div class="md:w-1/4 bg-gray-50 p-4 border-r border-gray-200">
+                        <h3 class="font-bold text-gray-700 mb-3">Questions</h3>
+                        <div id="questions-nav" class="grid grid-cols-5 gap-2"></div>
+                        
+                        <div class="mt-6">
+                            <h3 class="font-bold text-gray-700 mb-2">Legend</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="w-4 h-4 bg-blue-600 rounded mr-2"></div><span class="text-sm">Current</span>
+                            </div>
+                            <div class="flex items-center mb-2">
+                                <div class="w-4 h-4 bg-green-500 rounded mr-2"></div><span class="text-sm">Answered</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-yellow-500 rounded mr-2"></div><span class="text-sm">Flagged</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button id="submit-test" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold">Submit Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Question Area -->
+                    <div class="md:w-3/4 p-6">
+                        <div id="question-container"></div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button id="prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <div class="flex space-x-2">
+                                <button id="flag-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold">
+                                    <i class="fas fa-flag mr-2"></i> Flag
+                                </button>
+                                <button id="next-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold">
+                                    Next <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Selection Grid -->
+            <div class="mt-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">More Practice Tests</h2>
+                <!-- ADDED ID="test-list" FOR DYNAMIC LOADING -->
+                <div id="test-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Javascript will inject available tests here -->
+                    <p class="text-gray-500 col-span-3 text-center">Loading tests...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Modal -->
+        <div id="results-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trophy text-green-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Test Completed!</h2>
+                    <p class="text-gray-600 mb-6">You have successfully completed the test.</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700">Score:</span>
+                            <span id="score-value" class="font-bold text-blue-600">0/10</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700">Correct Answers:</span>
+                            <span id="correct-answers" class="font-bold text-green-600">0</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700">Incorrect Answers:</span>
+                            <span id="incorrect-answers" class="font-bold text-red-600">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-700">Time Taken:</span>
+                            <span id="time-taken" class="font-bold text-gray-600">0:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="review-answers-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">Review Answers</button>
+                        <button id="close-results" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-semibold">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Page Content -->
+        <section id="contact-page" class="page-content" data-page="contact">
+            <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-2xl animate-fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Contact Us</h2>
+                <p class="text-gray-600 mb-6">For direct support, enrollment questions, or bulk course inquiries, please reach out through any of the channels below.</p>
+                
+                <div class="space-y-4">
+                    <a href="https://wa.me/923013858453?text=Assalamualikum.%20I%20have%20a%20question%20about%20your%20courses." target="_blank" class="flex items-center p-4 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition duration-200">
+                        <i class="fab fa-whatsapp text-4xl text-green-600 mr-4"></i>
+                        <div class="flex-grow">
+                            <p class="font-semibold text-gray-800">WhatsApp Support Line</p>
+                            <p class="text-lg font-bold text-green-700">0301-3858453</p>
+                        </div>
+                        <i class="fas fa-arrow-right ml-auto text-green-600"></i>
+                    </a>
+
+                    <a href="mailto:soazali123@gmail.com" class="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-200 hover:bg-blue-100 transition duration-200">
+                        <i class="fas fa-envelope text-4xl text-blue-600 mr-4"></i>
+                        <div class="flex-grow">
+                            <p class="font-semibold text-gray-800">Email Support</p>
+                            <p class="text-lg font-bold text-blue-700">soazali123@gmail.com</p>
+                        </div>
+                        <i class="fas fa-arrow-right ml-auto text-blue-600"></i>
+                    </a>
+                </div>
+                
+                <div class="mt-10 pt-6 border-t border-gray-200 text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Follow Us on Social Media</h3>
+                    <div class="flex justify-center space-x-6">
+                        <a href="https://www.facebook.com/share/17hWMytBzP/" target="_blank" class="text-4xl text-gray-600 hover:text-blue-600 transition duration-200"><i class="fab fa-facebook-square"></i></a>
+                        <a href="https://www.tiktok.com/@dawnvocabulary.com?_r=1&_t=ZS-91Y1C1Vw8Un" target="_blank" class="text-4xl text-gray-600 hover:text-pink-600 transition duration-200"><i class="fab fa-instagram-square"></i></a>
+                        <a href="https://youtube.com/@spectrumenglish1901?si=ZxiVjS1cVRxbf_hm" target="_blank" class="text-4xl text-gray-600 hover:text-red-600 transition duration-200"><i class="fab fa-youtube-square"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p class="text-sm">&copy; 2024 Spectrum English. All Rights Reserved.</p>
+            <p class="text-xs text-gray-400 mt-1">Designed by Web Developer | <span class="text-blue-400">Zaheer Creations</span></p>
+        </div>
+    </footer>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. DEFAULT DATA (Fallbacks) ---
+        let testData = {
+            grammar: {
+                title: "English Grammar Test",
+                time: 30,
+                questions: [
+                    { id: 1, question: "Which sentence is grammatically correct?", options: ["She don't like apples.", "She doesn't like apples.", "She doesn't likes apples.", "She don't likes apples."], correctAnswer: 1, explanation: "Third person singular uses 'doesn't'." }
+                ]
+            }
+        };
+
+        // --- 2. INTERSECTION OBSERVER (Animations) ---
+        let observer;
+        const initObserver = () => {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const delay = parseInt(entry.target.getAttribute('data-delay')) || 0;
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, delay);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+        };
+
+        // --- 3. DYNAMIC CONTENT LOADING FUNCTIONS ---
+        
+        // A. Load Courses
+        function loadCourses() {
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            if (courses.length === 0) return; // If no data, keep default static HTML or show "No courses"
+
+            const container = document.getElementById('course-grid');
+            if (!container) return;
+
+            container.innerHTML = ''; // Clear existing content
+
+            courses.forEach((course, index) => {
+                const delay = (index % 6 + 1) * 100;
+                const isFree = course.price === 0 || course.price === "0" || course.category.includes('free');
+                
+                const priceDisplay = isFree 
+                    ? '<span class="text-2xl font-extrabold text-green-600">FREE</span>' 
+                    : `<span class="text-2xl font-extrabold text-red-600">PKR ${course.price}</span>`;
+                
+                const btnClass = isFree ? 'btn-download' : 'btn-whatsapp';
+                const btnText = isFree ? (course.linkType === 'whatsapp' ? 'Join Group' : 'Download') : 'Join Now';
+                
+                // Determine Link
+                let btnLink = '#';
+                if (course.file) btnLink = course.file;
+                else if (course.link) btnLink = course.link;
+                else if (!isFree) btnLink = `https://wa.me/923013858453?text=Interested%20in%20${encodeURIComponent(course.title)}%20Course.`;
+
+                const featuresHtml = course.features ? course.features.map(f => `<li><i class="fas fa-check-circle text-green-500 mr-2"></i> ${f}</li>`).join('') : '';
+
+                const html = `
+                    <div class="item-card bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-xl" 
+                         data-category="${course.category}" data-delay="${delay}">
+                        <img src="${course.image || 'https://placehold.co/600x150'}" alt="${course.title}" class="course-card-img">
+                        <div class="p-6">
+                            <span class="inline-block ${isFree ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                                ${isFree ? 'FREE' : 'PREMIUM'}
+                            </span>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">${course.title}</h3>
+                            <p class="text-sm text-gray-500 mb-4">${course.description}</p>
+                            <ul class="text-sm text-gray-600 space-y-2 mb-4">${featuresHtml}</ul>
+                            <div class="flex justify-between items-center mt-4">
+                                ${priceDisplay}
+                                <a href="${btnLink}" target="_blank" class="${btnClass} text-white px-4 py-2 text-sm rounded-lg font-semibold">
+                                    ${btnText}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+            
+            // Re-attach observer to new elements
+            document.querySelectorAll('#course-grid .item-card').forEach(el => observer.observe(el));
+        }
+
+        // B. Load Materials
+        function loadMaterials() {
+            const materials = JSON.parse(localStorage.getItem('materials')) || [];
+            if (materials.length === 0) return;
+
+            const container = document.getElementById('ebook-grid');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            materials.forEach((mat, index) => {
+                const delay = (index % 5 + 1) * 150;
+                const html = `
+                    <div class="item-card item-card-study bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-xl text-center" 
+                         data-category="${mat.category}" data-delay="${delay}">
+                        <img src="${mat.image || 'https://placehold.co/400x300'}" alt="${mat.title}" class="study-material-img">
+                        <div class="p-4">
+                            <h3 class="text-md font-bold text-gray-800 mb-1">${mat.title}</h3>
+                            <p class="text-sm font-semibold text-red-600 mb-3">${mat.category ? mat.category.toUpperCase() : 'PDF'}</p>
+                            <a href="${mat.file || '#'}" target="_blank" class="btn-download text-white px-3 py-2 text-xs rounded font-semibold inline-block">
+                                <i class="fas fa-download mr-1"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+            document.querySelectorAll('#ebook-grid .item-card-study').forEach(el => observer.observe(el));
+        }
+
+        // C. Load Tests & Update Quiz Engine
+        function loadTests() {
+            const tests = JSON.parse(localStorage.getItem('tests')) || [];
+            if (tests.length === 0) return;
+
+            const container = document.getElementById('test-list');
+            if (!container) return;
+            
+            container.innerHTML = ''; // Clear default hardcoded tests
+
+            tests.forEach((test, index) => {
+                // 1. Generate key for internal logic
+                const testKey = test.id || test.name.toLowerCase().replace(/\s+/g, '-');
+                
+                // 2. Update Global Test Data for Quiz Engine
+                testData[testKey] = {
+                    title: test.name,
+                    time: parseInt(test.duration),
+                    questions: test.questions
+                };
+
+                // 3. Render Card in UI
+                // Assign icon/color based on name or random
+                const colors = ['blue', 'green', 'purple', 'red', 'orange'];
+                const color = colors[index % colors.length];
+                const icons = {'grammar': 'pen-fancy', 'vocabulary': 'language', 'comprehension': 'book-reader'};
+                let icon = 'clipboard-list';
+                for(let k in icons) { if(test.name.toLowerCase().includes(k)) icon = icons[k]; }
+
+                const html = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition duration-300">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-${color}-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-${icon} text-${color}-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">${test.name}</h3>
+                                <p class="text-gray-600 text-sm">${test.questions.length} Questions • ${test.duration} Minutes</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4">Test your knowledge.</p>
+                        <button class="w-full bg-${color}-600 hover:bg-${color}-700 text-white py-2 rounded-lg font-semibold start-test-btn" 
+                                data-test="${testKey}">
+                            Start Test
+                        </button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Re-attach event listeners to new Start Test buttons
+            document.querySelectorAll('.start-test-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const testType = button.getAttribute('data-test');
+                    initializeTest(testType);
+                    // Scroll to top of quiz container
+                    document.getElementById('mcq-test-page').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        }
+
+        function loadAllAdminData() {
+            console.log("Syncing with Admin Data...");
+            loadCourses();
+            loadMaterials();
+            loadTests();
+        }
+
+        // --- 4. MCQ ENGINE LOGIC ---
+        let currentTest = 'grammar';
+        let currentQuestion = 0;
+        let userAnswers = {};
+        let flaggedQuestions = new Set();
+        let timer;
+        let timeRemaining;
+        let testStarted = false;
+        let isReviewMode = false;
+
+        const questionContainer = document.getElementById('question-container');
+        const questionsNav = document.getElementById('questions-nav');
+        const progressBar = document.getElementById('progress-bar');
+        const timerElement = document.getElementById('timer');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const flagBtn = document.getElementById('flag-btn');
+        const submitBtn = document.getElementById('submit-test');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resultsModal = document.getElementById('results-modal');
+        const testTitle = document.getElementById('test-title');
+
+        function initializeTest(testType) {
+            // Safety check if test exists
+            if (!testData[testType]) {
+                alert("Test data not found!");
+                return;
+            }
+
+            currentTest = testType;
+            currentQuestion = 0;
+            userAnswers = {};
+            flaggedQuestions = new Set();
+            testStarted = true;
+            isReviewMode = false;
+            
+            testTitle.textContent = testData[testType].title;
+            timeRemaining = testData[testType].time * 60;
+            updateTimerDisplay();
+            
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+            
+            generateQuestionNav();
+            loadQuestion(0);
+            updateProgressBar();
+            updateButtonStates();
+        }
+
+        function generateQuestionNav() {
+            questionsNav.innerHTML = '';
+            const questions = testData[currentTest].questions;
+            questions.forEach((_, index) => {
+                const qNum = document.createElement('div');
+                qNum.className = 'question-number w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer bg-gray-200';
+                qNum.textContent = index + 1;
+                qNum.addEventListener('click', () => loadQuestion(index));
+                if (index === 0) qNum.classList.add('active');
+                questionsNav.appendChild(qNum);
+            });
+        }
+
+        function loadQuestion(index) {
+            currentQuestion = index;
+            const question = testData[currentTest].questions[index];
+            
+            document.querySelectorAll('.question-number').forEach((el, i) => {
+                el.classList.remove('active');
+                if (i === index) el.classList.add('active');
+                if (userAnswers[i] !== undefined) el.classList.add('answered');
+                else if (flaggedQuestions.has(i)) el.classList.add('flagged');
+            });
+            
+            let optionsHTML = '';
+            question.options.forEach((option, optionIndex) => {
+                const isSelected = userAnswers[index] === optionIndex;
+                let optionClass = 'mcq-option p-4 border border-gray-300 rounded-lg mb-3';
+                if (isSelected) optionClass += ' selected';
+                
+                if (isReviewMode) {
+                    if (optionIndex === parseInt(question.correctAnswer)) optionClass += ' correct';
+                    else if (isSelected && optionIndex !== parseInt(question.correctAnswer)) optionClass += ' incorrect';
+                }
+                
+                optionsHTML += `
+                    <div class="${optionClass}" data-option="${optionIndex}">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center mr-3">
+                                ${isSelected ? '<i class="fas fa-check text-blue-600 text-xs"></i>' : ''}
+                            </div>
+                            <span>${option}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            let explanationHTML = isReviewMode ? `<div class="review-explanation mt-4"><h4 class="font-semibold text-gray-800 mb-2">Explanation:</h4><p class="text-gray-700">${question.explanation || 'No explanation provided.'}</p></div>` : '';
+            
+            questionContainer.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Question ${index + 1}</h2>
+                    <p class="text-lg text-gray-700 mb-6">${question.question}</p>
+                    <div class="options-container">${optionsHTML}</div>
+                    ${explanationHTML}
+                </div>
+            `;
+            
+            if (!isReviewMode) {
+                document.querySelectorAll('.mcq-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        selectOption(parseInt(option.getAttribute('data-option')));
+                    });
+                });
+            }
+            
+            flagBtn.style.display = isReviewMode ? 'none' : 'inline-block';
+            if(!isReviewMode) updateFlagButton();
+            updateButtonStates();
+        }
+
+        function selectOption(optionIndex) {
+            userAnswers[currentQuestion] = optionIndex;
+            document.querySelectorAll('.mcq-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.mcq-option[data-option="${optionIndex}"]`).classList.add('selected');
+            document.querySelectorAll('.question-number')[currentQuestion].classList.add('answered');
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const total = testData[currentTest].questions.length;
+            const answered = Object.keys(userAnswers).length;
+            progressBar.style.width = `${(answered / total) * 100}%`;
+        }
+
+        function updateButtonStates() {
+            prevBtn.disabled = currentQuestion === 0;
+            const total = testData[currentTest].questions.length;
+            nextBtn.disabled = currentQuestion === total - 1;
+            nextBtn.innerHTML = currentQuestion === total - 1 ? 'Finish <i class="fas fa-flag-checkered ml-2"></i>' : 'Next <i class="fas fa-arrow-right ml-2"></i>';
+        }
+
+        function updateFlagButton() {
+            if (flaggedQuestions.has(currentQuestion)) {
+                flagBtn.innerHTML = '<i class="fas fa-flag mr-2"></i> Unflag';
+                flagBtn.classList.replace('bg-yellow-500', 'bg-gray-500');
+                flagBtn.classList.replace('hover:bg-yellow-600', 'hover:bg-gray-600');
+            } else {
+                flagBtn.innerHTML = '<i class="fas fa-flag mr-2"></i> Flag';
+                flagBtn.classList.replace('bg-gray-500', 'bg-yellow-500');
+                flagBtn.classList.replace('hover:bg-gray-600', 'hover:bg-yellow-600');
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < testData[currentTest].questions.length - 1) loadQuestion(currentQuestion + 1);
+            else submitTest();
+        }
+
+        function updateTimer() {
+            if (timeRemaining > 0) {
+                timeRemaining--;
+                updateTimerDisplay();
+                if (timeRemaining === 300) timerElement.classList.add('timer-warning', 'text-red-500');
+            } else {
+                clearInterval(timer);
+                submitTest();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60);
+            const s = timeRemaining % 60;
+            timerElement.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function submitTest() {
+            clearInterval(timer);
+            testStarted = false;
+            let correct = 0;
+            let incorrect = 0;
+            const questions = testData[currentTest].questions;
+            
+            Object.keys(userAnswers).forEach(idx => {
+                // Important: Ensure loose comparison or parsing because localStorage might store as string
+                if (userAnswers[idx] == questions[idx].correctAnswer) correct++;
+                else incorrect++;
+            });
+            
+            document.getElementById('score-value').textContent = `${correct}/${questions.length}`;
+            document.getElementById('correct-answers').textContent = correct;
+            document.getElementById('incorrect-answers').textContent = incorrect;
+            document.getElementById('time-taken').textContent = `${Math.floor((testData[currentTest].time * 60 - timeRemaining) / 60)}:${((testData[currentTest].time * 60 - timeRemaining) % 60).toString().padStart(2, '0')}`;
+            
+            resultsModal.classList.remove('hidden');
+        }
+
+        // --- 5. INITIALIZATION & EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initObserver();
+            
+            // 1. Load Data from LocalStorage
+            loadAllAdminData();
+            
+            // 2. Setup Page Navigation
+            const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+
+            const showPage = (pageId) => {
+                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById(`${pageId}-page`);
+                if (target) {
+                    target.classList.add('active');
+                    window.scrollTo(0,0);
+                    // Re-trigger animations
+                    target.querySelectorAll('.item-card, .item-card-study, .animate-fade-in').forEach(el => {
+                        el.classList.remove('visible');
+                        observer.observe(el);
+                    });
+                }
+                document.querySelectorAll('.nav-link').forEach(l => {
+                    l.classList.toggle('active', l.getAttribute('data-page') === pageId);
+                });
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showPage(link.getAttribute('data-page'));
+                    mobileMenu.classList.add('-translate-x-full'); // Close mobile menu
+                    backdrop.classList.add('hidden');
+                });
+            });
+
+            // 3. Mobile Menu Handlers
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                mobileMenu.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            });
+            document.getElementById('close-menu-btn').addEventListener('click', () => {
+                mobileMenu.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            });
+
+            // 4. Filter Logic
+            const setupFilter = (listId, gridId, itemClass) => {
+                document.getElementById(listId).addEventListener('click', (e) => {
+                    if (e.target.classList.contains('category-filter')) {
+                        // Update active class
+                        document.querySelectorAll(`#${listId} .category-filter`).forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        const filter = e.target.getAttribute('data-filter');
+                        document.querySelectorAll(`#${gridId} .${itemClass}`).forEach(card => {
+                            const cats = card.getAttribute('data-category');
+                            if (filter === 'all-courses' || filter === 'all-study' || (cats && cats.includes(filter))) {
+                                card.style.display = 'block';
+                                setTimeout(() => card.classList.add('visible'), 50); // Re-trigger fade
+                            } else {
+                                card.style.display = 'none';
+                                card.classList.remove('visible');
+                            }
+                        });
+                    }
+                });
+            };
+            
+            setupFilter('course-categories-list', 'course-grid', 'item-card');
+            setupFilter('study-categories-list', 'ebook-grid', 'item-card-study');
+
+            // 5. MCQ Engine Bindings
+            prevBtn.addEventListener('click', () => { if(currentQuestion > 0) loadQuestion(currentQuestion - 1); });
+            nextBtn.addEventListener('click', nextQuestion);
+            flagBtn.addEventListener('click', () => {
+                if (flaggedQuestions.has(currentQuestion)) flaggedQuestions.delete(currentQuestion);
+                else flaggedQuestions.add(currentQuestion);
+                updateFlagButton();
+            });
+            pauseBtn.addEventListener('click', () => {
+                if(testStarted) { clearInterval(timer); pauseBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Resume'; testStarted = false; }
+                else { timer = setInterval(updateTimer, 1000); pauseBtn.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause'; testStarted = true; }
+            });
+            submitBtn.addEventListener('click', () => {
+                if(isReviewMode) {
+                    // Exit Review Mode
+                    isReviewMode = false;
+                    document.querySelector('.text-center').style.display = 'block';
+                    pauseBtn.style.display = 'inline-block';
+                    submitBtn.textContent = 'Submit Test';
+                    submitBtn.classList.replace('bg-blue-600', 'bg-red-600');
+                    submitBtn.classList.replace('hover:bg-blue-700', 'hover:bg-red-700');
+                    // Reset to test selection
+                    document.getElementById('mcq-test-page').scrollIntoView();
+                } else {
+                    submitTest();
+                }
+            });
+
+            document.getElementById('close-results').addEventListener('click', () => { resultsModal.classList.add('hidden'); });
+            
+            document.getElementById('review-answers-btn').addEventListener('click', () => {
+                resultsModal.classList.add('hidden');
+                isReviewMode = true;
+                testStarted = false;
+                document.querySelector('.text-center').style.display = 'none'; // Hide timer
+                pauseBtn.style.display = 'none';
+                submitBtn.textContent = 'Back to Test Selection';
+                submitBtn.classList.replace('bg-red-600', 'bg-blue-600');
+                submitBtn.classList.replace('hover:bg-red-700', 'hover:bg-blue-700');
+                loadQuestion(0);
+            });
+
+            // Initial Observation of static elements
+            document.querySelectorAll('.animate-fade-in').forEach(el => observer.observe(el));
+        });
+
+        // --- 6. ADMIN PANEL SYNC LISTENER ---
+        window.addEventListener('adminDataUpdated', function() {
+            console.log("Admin Data Updated Event Received");
+            loadAllAdminData();
+            // Optional: Show a toast notification here
+        });
+
+    </script>
+</body>
+</html>

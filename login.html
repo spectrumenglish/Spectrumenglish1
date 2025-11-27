@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Spectrum English</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="login-container rounded-2xl p-8 max-w-md w-full">
+        <!-- Logo & Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mr-3">
+                    <i class="fas fa-book-open text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white">
+                        <span class="text-blue-200">Spectrum</span> English
+                    </h1>
+                    <p class="text-blue-100 text-sm mt-1">Admin Panel Access</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-6" autocomplete="off" novalidate>
+            <div>
+                <label for="email" class="block text-white text-sm font-medium mb-2">
+                    <i class="fas fa-envelope mr-2"></i>Email
+                </label>
+                <div class="relative">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-blue-200 focus:outline-none" 
+                        placeholder="Enter your email" 
+                        required
+                        autocomplete="username"
+                    >
+                    <i class="fas fa-envelope absolute right-3 top-3 text-blue-200"></i>
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-white text-sm font-medium mb-2">
+                    <i class="fas fa-lock mr-2"></i>Password
+                </label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-blue-200 focus:outline-none" 
+                        placeholder="Enter your password" 
+                        required
+                        autocomplete="current-password"
+                    >
+                    <i class="fas fa-lock absolute right-3 top-3 text-blue-200"></i>
+                </div>
+            </div>
+
+            <button 
+                type="submit" 
+                class="login-btn w-full text-white py-3 rounded-lg font-semibold text-lg"
+            >
+                <i class="fas fa-sign-in-alt mr-2"></i>Login to Admin Panel
+            </button>
+        </form>
+
+        <!-- Admin Info (Password Hidden) -->
+        <div class="mt-6 p-4 bg-white/10 rounded-lg border border-white/20">
+            <h3 class="text-white text-sm font-semibold mb-2 text-center">
+                <i class="fas fa-info-circle mr-1"></i>Admin Access
+            </h3>
+            <div class="space-y-2 text-center">
+                <div class="text-blue-200 text-sm">
+                    <strong>Email:</strong> 
+                    <code class="bg-white/20 px-2 py-1 rounded ml-1">spectrumeng98@gmail.com</code>
+                </div>
+                <div class="text-blue-200 text-sm">
+                    <strong>Status:</strong> 
+                    <span class="bg-green-500/20 px-2 py-1 rounded ml-1 text-green-300">Secure Access</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Website -->
+        <div class="text-center mt-6">
+            <a 
+                href="index.html" 
+                class="text-blue-200 hover:text-white text-sm transition duration-300 inline-flex items-center"
+            >
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Main Website
+            </a>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-4 text-center">
+            <p class="text-blue-100 text-xs">
+                <i class="fas fa-shield-alt mr-1"></i>
+                Secure Admin Access Only
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Clear any existing login on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (email === 'spectrumeng98@gmail.com' && password === 'zaheercreationwebd123') {
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminEmail', email);
+                alert('Login successful! Redirecting...');
+                window.location.href = 'admin/admin.html';
+            } else {
+                alert('Invalid credentials!');
+            }
+        });
+
+        // Auto-redirect if already logged in
+        if (localStorage.getItem('adminLoggedIn')) {
+            window.location.href = 'admin/admin.html';
+        }
+    </script>
+</body>
+</html>

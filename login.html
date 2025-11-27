@@ -159,7 +159,8 @@
                 localStorage.setItem('adminLoggedIn', 'true');
                 localStorage.setItem('adminEmail', email);
                 alert('Login successful! Redirecting...');
-                window.location.href = 'admin/admin.html';
+                // Corrected redirect path to root admin.html
+                window.location.href = 'admin.html';
             } else {
                 alert('Invalid credentials!');
             }
@@ -167,7 +168,7 @@
 
         // Auto-redirect if already logged in
         if (localStorage.getItem('adminLoggedIn')) {
-            window.location.href = 'admin/admin.html';
+            window.location.href = 'admin.html';
         }
     </script>
 </body>

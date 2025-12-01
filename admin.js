@@ -1,4 +1,21 @@
-// SIMPLE WORKING ADMIN.JS - COMPLETE FILE (FIXED)
+// ---- FIREBASE IMPORTS & CONFIG ----
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCWPnWFcRLy3BMxBmi5hl3RfeR8n-Tqa8",
+  authDomain: "mywe-cfed3.firebaseapp.com",
+  projectId: "mywe-cfed3",
+  storageBucket: "mywe-cfed3.firebasestorage.app",
+  messagingSenderId: "395232065402",
+  appId: "1:395232065402:web:350f8ca9ea5c37c5ad48c3",
+  measurementId: "G-B3CG89SX0Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ==== ADMIN PANEL CLASS ====
 class AdminPanel {
     constructor() {
         this.categories = JSON.parse(localStorage.getItem('categories')) || [
@@ -7,96 +24,64 @@ class AdminPanel {
         ];
         this.courses = JSON.parse(localStorage.getItem('courses')) || [];
         this.tests = JSON.parse(localStorage.getItem('tests')) || [];
-        this.materials = JSON.parse(localStorage.getItem('materials')) || [];
+        this.materials = []; // Firestore سے لائیں گے!
     }
     
-    // ⭐ FIX #1: New method to initialize default data (data loss prevention) ⭐
     initializeDefaultData() {
         console.log("Checking and initializing default data...");
-
-        // NOTE: Aapko yahan apne index.html se hardcoded data objects shamil karne honge.
-        // Agar aap yeh step chhod denge, aur aapka localStorage khali hua, to purana data gayab ho jayega.
-        
-        // Example structure:
-        const defaultCourses = []; // Fill your course objects here!
-        const defaultTests = [];   // Fill your test objects here!
-        const defaultMaterials = []; // Fill your material objects here!
-
+        const defaultCourses = [];
+        const defaultTests = [];
         if (this.courses.length === 0 && !localStorage.getItem('courses')) {
              localStorage.setItem('courses', JSON.stringify(defaultCourses));
              this.courses = defaultCourses;
         }
-
         if (this.tests.length === 0 && !localStorage.getItem('tests')) {
              localStorage.setItem('tests', JSON.stringify(defaultTests));
              this.tests = defaultTests;
         }
-
-        if (this.materials.length === 0 && !localStorage.getItem('materials')) {
-             localStorage.setItem('materials', JSON.stringify(defaultMaterials));
-             this.materials = defaultMaterials;
-        }
     }
 
-
-    init() {
-        // Login check
+    async init() {
         if (!localStorage.getItem('adminLoggedIn')) {
             window.location.href = '../login.html';
             return;
         }
-
         console.log('Admin Panel Loaded!');
-        
-        // ⭐ FIX #1: Initialize default data at start ⭐
         this.initializeDefaultData(); 
-        
         this.loadDashboard();
         this.setupEventListeners();
-        
-        // Load tables for current views (Admin Panel pe data dikhane ke liye)
+
+        // Courses/tests old way, materials from Firestore:
         this.loadCoursesTable();
-        this.loadMaterialsTable();
         this.loadTestsTable();
+        await this.loadMaterialsFromFirestore();
     }
 
     setupEventListeners() {
-        // Logout button
         document.getElementById('logout-btn').addEventListener('click', () => {
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminEmail');
             window.location.href = '../login.html';
         });
 
-        // Course form
         document.getElementById('course-form').addEventListener('submit', (e) => this.saveCourse(e));
-        
-        // Test form  
         document.getElementById('test-form').addEventListener('submit', (e) => this.saveTest(e));
-        
-        // Material form
         document.getElementById('material-form').addEventListener('submit', (e) => this.saveMaterial(e));
     }
 
     loadDashboard() {
-        console.log('Loading dashboard...');
-        // Ensure properties are up-to-date from localStorage
         this.courses = JSON.parse(localStorage.getItem('courses')) || [];
         this.tests = JSON.parse(localStorage.getItem('tests')) || [];
-        this.materials = JSON.parse(localStorage.getItem('materials')) || [];
-        
+        // this.materials کو Firestore سے handle کریں گے
         document.getElementById('total-courses').textContent = this.courses.length;
         document.getElementById('total-tests').textContent = this.tests.length;
         document.getElementById('total-materials').textContent = this.materials.length;
     }
 
-    // ⭐ FIX #3: Missing table loading functions (Data Control Panel pe dikhega) ⭐
-    
     loadCoursesTable() {
         const tableBody = document.getElementById('courses-table-body');
         if (!tableBody) return;
-        tableBody.innerHTML = ''; // Clear existing rows
-
+        tableBody.innerHTML = '';
         this.courses.forEach(course => {
             const row = tableBody.insertRow();
             row.innerHTML = `
@@ -115,7 +100,6 @@ class AdminPanel {
         const tableBody = document.getElementById('tests-table-body');
         if (!tableBody) return;
         tableBody.innerHTML = ''; 
-
         this.tests.forEach(test => {
             const row = tableBody.insertRow();
             row.innerHTML = `
@@ -134,7 +118,6 @@ class AdminPanel {
         const tableBody = document.getElementById('materials-table-body');
         if (!tableBody) return;
         tableBody.innerHTML = ''; 
-
         this.materials.forEach(material => {
             const row = tableBody.insertRow();
             row.innerHTML = `
@@ -149,13 +132,48 @@ class AdminPanel {
         });
     }
 
-    // COURSE MANAGEMENT - UPDATED VERSION
+    // === FIRESTORE CODE FOR MATERIALS ===
+    async saveMaterial(e) {
+        e.preventDefault();
+        console.log('Saving material...');
+        const materialData = {
+            id: 'm-' + Date.now().toString(),
+            title: document.getElementById('material-title').value,
+            category: document.getElementById('material-category').value,
+            file: document.getElementById('material-file').value || '#',
+            image: document.getElementById('material-image').value || 'https://placehold.co/400x300/007bff/ffffff?text=New+Material',
+            createdAt: new Date().toISOString()
+        };
+        try {
+            await addDoc(collection(db, "materials"), materialData);
+            alert('Material added successfully!');
+            await this.loadMaterialsFromFirestore();
+            this.closeModal('material-modal');
+            e.target.reset();
+        } catch (error) {
+            alert("Error saving to Firestore: " + error.message);
+        }
+    }
+
+    async loadMaterialsFromFirestore() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "materials"));
+            this.materials = [];
+            querySnapshot.forEach((doc) => {
+                this.materials.push(doc.data());
+            });
+            this.loadMaterialsTable();
+            this.loadDashboard();
+        } catch (error) {
+            console.error("Error loading materials from Firestore:", error);
+        }
+    }
+
+    // --- COURSE/TEST LOCAL (no Firestore), rest same ---
     saveCourse(e) {
         e.preventDefault();
         console.log('Saving course...');
-        
         const courseData = {
-            // ⭐ FIX #2: Ensure unique ID generation, use Date.now() for unique id only ⭐
             id: 'c-' + Date.now().toString(), 
             title: document.getElementById('course-title').value,
             price: parseInt(document.getElementById('course-price').value) || 0,
@@ -166,29 +184,21 @@ class AdminPanel {
             file: document.getElementById('course-file')?.value || '#', 
             createdAt: new Date().toISOString()
         };
-
         this.courses.push(courseData);
         localStorage.setItem('courses', JSON.stringify(this.courses));
-        
-        // ADDED: Force website update
         localStorage.setItem('courses_updated', Date.now().toString());
         broadcastUpdate();
-        
         alert('Course added successfully!');
         this.loadDashboard();
-        this.loadCoursesTable(); // ⭐ FIX #3: Table ko update karein ⭐
+        this.loadCoursesTable();
         this.closeModal('course-modal');
-        
-        // ADDED: Reset form
         e.target.reset();
     }
 
     saveTest(e) {
         e.preventDefault();
         console.log('Saving test...');
-        
         const testData = {
-            // ⭐ FIX #2: Ensure unique ID generation ⭐
             id: 't-' + Date.now().toString(), 
             name: document.getElementById('test-name').value,
             duration: parseInt(document.getElementById('test-duration').value) || 30,
@@ -196,62 +206,18 @@ class AdminPanel {
             questions: this.getTestQuestions(), 
             createdAt: new Date().toISOString()
         };
-
         this.tests.push(testData);
         localStorage.setItem('tests', JSON.stringify(this.tests));
-        
-        // ADDED: Force website update
         localStorage.setItem('tests_updated', Date.now().toString());
         broadcastUpdate();
-        
         alert('Test added successfully!');
         this.loadDashboard();
-        this.loadTestsTable(); // ⭐ FIX #3: Table ko update karein ⭐
+        this.loadTestsTable();
         this.closeModal('test-modal');
-        
-        // ADDED: Reset form
         e.target.reset();
     }
 
-    saveMaterial(e) {
-        e.preventDefault();
-        console.log('Saving material...');
-        
-        // ⭐ FIX #2: Material Duplication Fix (Logic se data ko sirf ek baar save karna) ⭐
-        // Aapka code is waqt hamesha naya material add kar raha hai (this.materials.push(materialData);).
-        // Agar yeh duplication create kar raha hai, to iski wajah yeh hai ke:
-        // 1. Event listener multiple times attached ho raha hai (jo setupEventListeners mein theek lag raha hai)
-        // 2. Ya user ne double click kiya hai.
-        // Hamesha naya ID generate ho raha hai, isliye duplication ko rokne ke liye:
-
-        const materialData = {
-            id: 'm-' + Date.now().toString(), // ⭐ FIX #2: Unique ID ⭐
-            title: document.getElementById('material-title').value,
-            category: document.getElementById('material-category').value,
-            file: document.getElementById('material-file').value || '#',
-            image: document.getElementById('material-image').value || 'https://placehold.co/400x300/007bff/ffffff?text=New+Material',
-            createdAt: new Date().toISOString()
-        };
-
-        this.materials.push(materialData); // Agar yeh line bar bar chal rahi hai, to 2nd time data save hoga
-        localStorage.setItem('materials', JSON.stringify(this.materials));
-        
-        // ADDED: Force website update
-        localStorage.setItem('materials_updated', Date.now().toString());
-        broadcastUpdate();
-        
-        alert('Material added successfully!');
-        this.loadDashboard();
-        this.loadMaterialsTable(); // ⭐ FIX #3: Table ko update karein ⭐
-        this.closeModal('material-modal');
-        
-        // ADDED: Reset form
-        e.target.reset();
-    }
-
-    // ADDED: Helper function to get course features
     getCourseFeatures() {
-        // You can modify this to get features from form inputs
         return [
             "Interactive Learning",
             "Certificate Provided", 
@@ -260,9 +226,7 @@ class AdminPanel {
         ];
     }
 
-    // ADDED: Helper function to get test questions
     getTestQuestions() {
-        // You can modify this to get questions from form inputs
         return [
             {
                 question: "Sample question 1?",
@@ -284,47 +248,36 @@ class AdminPanel {
     }
 }
 
-// Global functions (inmein koi tabdeeli nahi ki gayi)
+// ---- GLOBALS ----
 function openCourseModal() {
     document.getElementById('course-modal').classList.remove('hidden');
 }
-
 function openTestModal() {
     document.getElementById('test-modal').classList.remove('hidden');
 }
-
 function openMaterialModal() {
     document.getElementById('material-modal').classList.remove('hidden');
 }
-
 function closeModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
-
-// ADDED: Debug function to check localStorage
 function debugAdminData() {
     console.log("=== ADMIN DATA DEBUG ===");
     console.log("Courses:", JSON.parse(localStorage.getItem('courses')) || []);
     console.log("Tests:", JSON.parse(localStorage.getItem('tests')) || []);
-    console.log("Materials:", JSON.parse(localStorage.getItem('materials')) || []);
+    // Materials now in Firestore—log the class variable!
+    // You can log window.adminPanel.materials from the console if needed
     console.log("Courses Updated:", localStorage.getItem('courses_updated'));
     console.log("Tests Updated:", localStorage.getItem('tests_updated'));
-    console.log("Materials Updated:", localStorage.getItem('materials_updated')); // Corrected key check
 }
-
-// Run debug every 10 seconds
 setInterval(debugAdminData, 10000);
-
-// ADDED: Broadcast storage changes to all tabs/windows
 function broadcastUpdate() {
     window.dispatchEvent(new Event('adminDataUpdated'));
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const adminPanel = new AdminPanel();
-    adminPanel.init();
-    
-    // ADDED: Initial debug
+// ---- ON PAGE LOAD ----
+document.addEventListener('DOMContentLoaded', async () => {
+    window.adminPanel = new AdminPanel();
+    await window.adminPanel.init();
     debugAdminData();
 });
